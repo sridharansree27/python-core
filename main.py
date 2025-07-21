@@ -38,9 +38,11 @@ class Abstract(ABC,Thread):
     def input():
         n = int(input("Enter number of customers: "))
 
-        for _ in range(n):
-            name = input("Name: ")
-            Abstract.customer.append(Driver(name))
+        def f(cls):
+            for _ in range(n):
+              name = input("Name: ")
+              Abstract.customer.append(cls(name))
+        f(Driver)
 
        # for _ in Abstract.__iter__():
        #     Bank.main(_)
@@ -62,7 +64,8 @@ class Abstract(ABC,Thread):
                    self.customer = customer
 
                def run(self):
-                   Bank.main(self.customer)
+                   #Bank.main(self.customer)
+                   self.customer.process(Bank.main)
 
            threads = []
 
@@ -156,6 +159,9 @@ class Driver(Bank):
     def __init__(self,name):
         super().__init__(name)
 
+    def process(self, f):
+        f(self)
+
 Abstract.input()
 
 #if Abstract.customer[0]==Abstract.customer[1]:
@@ -165,3 +171,73 @@ Abstract.input()
 
 #for _ in Abstract.customer:
 # Bank.main(_)
+
+###
+#COCEPTS
+#Desin pattern
+class C:
+    @staticmethod
+    def disp():
+        print("CLASS-C")
+
+def f1(f,c):
+    def f3():
+        print("FUNCTION-F1")
+        f()
+        c.disp()
+    return f3
+
+def f2():
+    print("FUNCTION-F2")
+
+f1(f2,C)()
+
+#Dynamic Type object creation
+class X:
+  @staticmethod
+  def show():
+      return "X"
+
+print(X.show.__code__)
+
+super_dict = {'x': 30}
+Super = type('Super', (), super_dict)
+
+sub_inner_dict = {'z': 20}
+Sub_Inner = type('Sub_Inner', (), sub_inner_dict)
+
+sub_outer_dict = {'y': 10, 'show': X.show, 'Sub_Inner': Sub_Inner}
+Sub_Outer = type('Sub_Outer', (Super,), sub_outer_dict)
+
+print(type(X))
+print(Super.__dict__)
+
+print("---------------------------------------")
+print(type(Sub_Outer))
+print(Sub_Outer.__dict__)
+
+print("---------------------------------------")
+print(type(Sub_Outer.Sub_Inner))
+print(Sub_Outer.Sub_Inner.__dict__)
+
+#Dynamic Function object creation
+import types
+
+func_source = """
+def dynamic_function(name):
+    return f"{name}!"
+"""
+
+namespace = {}
+
+exec(func_source, namespace)
+
+new_func = namespace['dynamic_function']
+
+wrapped_func = types.FunctionType(
+    new_func.__code__,
+    globals(),
+    name='dynamic_function'
+)
+print(wrapped_func("Sridharan"))
+###
