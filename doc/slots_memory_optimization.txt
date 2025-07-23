@@ -1,0 +1,41 @@
+• When we create an object, it can dynamically store attributes using a hidden dictionary called __dict__
+But this,
+    • Uses more memory
+    • Is slightly slower to access attributes
+• If we want to make object lightweight, we can use __slots__
+
+__slots__
+• Python creates a static, fixed-size structure (similar to a C struct) for storing attributes
+• Each attribute is stored at a predefined memory offset (e.g., slot 0 = name, slot 1 = age)
+• No need to store attribute names or keys as strings — memory is allocated based only on defined slots
+• No hashing, dictionary resizing, or collision handling is involved
+• Result: Faster attribute access and lower memory usage
+
+__dict__
+• Python creates a dictionary to store instance attributes
+• Stores attribute names or keys as strings (e.g., "name", "age")
+• Stores values as references to the actual data
+• Involves hashing, key lookups, resizing, and collision resolution (like any dictionary)
+• Result: Flexible, but more memory-intensive and slightly slower
+
+import sys
+
+class A:
+    def __init__(self):
+        self.x = 10
+        self.y = 20
+
+class B:
+    __slots__ = ['x', 'y']
+    def __init__(self):
+        self.x = 10
+        self.y = 20
+
+a = A()
+b = B()
+
+total_a=sys.getsizeof(a)+sys.getsizeof(a.__dict__)
+total_b=sys.getsizeof(b) # all attributes are inside
+
+print("Total for A (with dict):",total_a) # ~344
+print("Total for B (with slots):",total_b) # ~48

@@ -1,0 +1,59 @@
+Reference Counting
+    • Every object in Python keeps track of how many references (names or containers) point to it
+    • When this reference count drops to 0, Python automatically deletes the object (frees memory)
+
+import sys
+a = [1, 2, 3]
+print(sys.getrefcount(a))  # Output: e.g., 2
+
+Why 2? Because,
+    • a is one reference
+    • getrefcount() internally creates another temporary reference when passed
+
+Garbage Collector
+
+    • When two or more objects reference each other in a loop, their reference count never drops to zero. This means reference counting alone can't free them.
+    • Python solves this with a garbage collector (GC) to detect and clean up such cycles
+
+import gc
+
+class A:
+    def __init__(self):
+        self.b = None
+
+a = A()
+b = A()
+a.b = b
+b.b = a  # Cycle: a ↔ b
+
+del a
+del b
+
+# del not deletes the object in memory it just remove the name "a" mapped to the object at memory
+
+gc.collect()  # Detects and frees the cycle
+
+import gc
+
+    • Import Python's garbage collection module (gc)
+    • It allows to trigger collection manually or inspect the collector
+
+What just happened?
+    • Creates two instances: a and b
+          a.b refers to b
+          b.b refers to a
+    • This creates a circular reference (cycle)
+       a → b → a
+
+del a, del b
+    • Delete the names a and b
+    • But the actual objects are still in memory because:
+      a refers to b
+      b refers to a
+    • Their reference counts are not zero because of the cycle
+
+gc.collect()
+    • Python's garbage collector kicks in
+    • It scans all known objects
+    • Detects the cycle
+    • Breaks it and frees the memory

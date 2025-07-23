@@ -1,0 +1,57 @@
+Stack
+    • First In Last Out(FILO)
+Frame
+    • A frame is an internal Python object that stores everything needed to run a function
+    • Whenever a function is called in Python, the interpreter creates a frame object to execute the function call
+    • Each time when calling a function, Python pushes a new frame on top
+    • When a function finishes, Python pops its frame off
+    • Namespace present inside the frame object
+
+Each frame object contains,
+PART	STORES
+Local variables	The variables used inside that function
+Instruction pointer	The line of bytecode being executed
+Reference to the caller	Who called this function (parent frame)
+
+def f(name):
+    return name
+
+def main():
+    result = f("Hello World")
+    print(result)
+
+main()
+
+Step 1: Module frame or Global frame
+    • The first frame Python creates when the script execution starts
+    • Where Python stores all top-level code like
+        • Global namespace
+        • Global variables
+        • Function/class definitions
+        • if __name__ == "__main__" blocks
+
+[ <module frame> ]  ← bottom of the stack
+
+Step 2: main() is called
+    • Python pushes a new frame for main() on top of the stack
+
+[ main()         ]  ← top (now executing)
+[ <module frame> ]
+
+Step 3: Inside main(), f("Hello World") is called
+    • Python pushes a new frame for f()
+
+[ f("Hello World") ]  ← executing now
+[ main()         ]  ← waiting
+[ <module frame> ]
+
+Step 4: greet() returns
+    • Python pops the f() frame off the stack (it's done)
+
+[ main()         ]  ← resumes here
+[ <module frame> ]
+
+Step 5: main() finishes
+    • Its frame is popped
+
+[ <module frame> ]  ← only this remains

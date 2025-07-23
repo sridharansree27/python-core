@@ -1,0 +1,104 @@
+When we access an attribute like o.x, Python follows a specific search order to find that attribute(x
+
+o.x
+
+• Check in the instance namespace(o.__dict__)
+    • If found → return it
+• Check in the class(C) namespace(o.__class__.__dict__['x'] or type(o).__dict__['x'])
+    • If found:
+        ○ If the class(C) is a descriptor with function __get__ then call __get__
+        ○ Else, return the attribute(x) in class namespace(o.__class__.__dict__['x'])
+    • If not found
+        ○  If an attribute x is not found in the instance namespace(o.__dict__['x']) or in class C namespace(o.__class__.__dict__['x']), Python follows the Method Resolution Order (MRO) of class C to search through its super classes. It continues this process until it finds the attribute x. If the attribute is not found in any class in the MRO chain, Python raises an AttributeError
+
+__mro__ , mro()
+
+• We can find the method resolution order of a class by accessing any of the functions __mro__ or mro() present in the class object of type=Type
+
+C3 Linearization
+
+• It is an algorithm Python uses to compute the MRO (Method Resolution Order)-i.e., the order in which classes are searched when looking for attributes/methods
+• It ensures that,
+    • Children come before parents
+    • The order of base classes or super classes in the class definition is respected from left to right
+    • No class is repeated in the MRO
+    • All parent classes are resolved in a consistent and linear fashion
+
+class A:
+    pass
+
+class B(A):
+    pass
+
+class C(A):
+    pass
+
+class D(B, C):
+    pass
+
+print(D.__mro__) # (<class '__main__.D'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.A'>, <class 'object'>)
+
+Python computes C3 Linearization of above class(D) using the formula,
+
+MRO(D) = D + merge(MRO(B), MRO(C), [B, C])
+
+Step 1: Compute MROs
+
+• D +
+Start the MRO list with the class(D)
+• MRO(B)
+  Get the MRO of B
+  MRO(B) = [B, A, object]
+• MRO(C)
+  Get the MRO of C
+  MRO(C) = [C, A, object]
+• [B, C]
+  This is the original base class list
+  The list of direct parent classes of D
+  Base list = [B, C]
+• merge()
+  A process that combines these MROs in a way that
+    •   Preserves left to right order of base classes
+    •   Avoids duplicates
+    •   Respects parent-child relationships
+
+Step 2: Apply merge()
+
+MRO(D) = D + merge([B, A, object], [C, A, object], [B, C])
+
+Head = [B,C,B]
+Tail = [A,A,C]
+• Heads: B (from B list), C (from C list), B (from [B, C]) → Check if B appears in any tails,
+    • If B is not in any tail → pick B → Add B to MRO → Remove B from all lists
+    • If B is in any tail -> not pick B
+Remaining: [A, object], [C, A, object], [C]
+
+Head = [A,C,C]
+Tail = [Object,A,[]]
+• Heads: A (from B list), C (from C list), C (from [C]) 
+Check if A appears in any tails,
+    • If A is not in any tail → pick A → Add A to MRO → Remove A from all lists
+    • If A is in any tail -> not pick A
+Check if C appears in any tails,
+    • If C is not in any tail → pick C → Add C to MRO → Remove C from all lists
+    • If C is in any tail -> not pick C
+Remaining: [A, object], [A, object], []
+
+Head = [A,A,[]]
+Tail = [Object,Object,[]]
+• Heads: A (from B list), A (from C list), [] (from []) 
+Check if A appears in any tails,
+    • If A is not in any tail → pick A → Add A to MRO → Remove A from all lists
+    • If A is in any tail -> not pick A
+Remaining: [object], [object], []
+
+Head = [Object,Object,[]]
+Tail = []
+• Heads: Object (from B list), Object (from C list), [] (from []) 
+Check if Object appears in any tails,
+    • If Object is not in any tail → pick Object → Add Object to MRO → Remove Object from all lists
+    • If Object is in any tail -> not pick Object
+Remaining: [], [], []
+
+Step 3: Final MRO
+D → B → C → A → object

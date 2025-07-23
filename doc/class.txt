@@ -1,0 +1,26 @@
+Class Object Creation
+
+C()
+__call__()
+    • An object can be made callable by defining a special method called __call__() inside its class
+    • Treat the object like a function and call it using parentheses—o(),just like f()
+    • C() -> C.__call__(C, *args, **kwargs)
+
+    # Pseudo-code of C.__call__
+
+    def __call__(C, *args, **kwargs):
+        o = C.__new__(C, *args, **kwargs) # Step 1
+        if isinstance(o, C):
+            C.__init__(o, *args, **kwargs) # Step 2
+        return o # Step 3
+    
+
+Object Allocation  __new__() 
+    • Python allocates new memory
+    • This is handled by C.__new__()
+    • It returns the empty object(self) or empty namespace before initialization
+
+Object Initialization __init__()
+    • After the blank object is created, Python calls C.__init__(self) to initialize attributes of empty object or empty namespace
+    • This is where you typically assign to self.x, self.name, etc.
+    • These assignments go into the object’s namespace, which is accessible as self.__dict__

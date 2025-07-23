@@ -1,0 +1,38 @@
+Function Object Creation
+
+def f(name):
+    return name
+
+When Python executes the def statement, it performs two key operations
+
+Compilation
+
+    • Compiles the body of the function (the return statement and logic) into a code object, which is of type types.Code
+
+The code object contains,
+    
+    1. the function's bytecode
+    
+    2. variable names
+    
+    3. constants
+    
+    4. number of arguments, etc.
+
+    • f.__code__ is the compiled function body
+
+Runtime Binding
+
+At runtime, when Python executes the def f(name),
+
+    • Takes the compiled object of type Code,
+    • Wraps it inside a function object(instance of types.Function)
+    • Binds it to the name f in the current namespace(Global)
+
+import types
+# Function is created dynamically at runtime like this:
+f = types.Function(
+    code=f.__code__,
+    globals=globals(),
+    name="f"
+)

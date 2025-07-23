@@ -1,0 +1,62 @@
+A descriptor is a class that controls attribute access (get, set, delete) on another class using the following special methods,
+
+Access
+__get__ 
+
+Set
+__set__
+
+Delete
+__delete__
+
+A class that defines any of the descriptor methods (__get__, __set__, or __delete__) is called a descriptor class
+
+class D:
+  def __get__(self, instance, owner):
+    print("Getting value...")
+    return instance.__dict__.get('key', None)
+
+  def __set__(self, instance, value):
+    print("Setting value...")
+    instance.__dict__['key']=value
+
+  def __delete__(self, instance):
+    print("Deleting value...")
+    if 'key' in instance.__dict__:
+      del instance.__dict__['key']
+
+class C:
+  x=D()
+
+o=C()
+
+# Setting value using descriptor
+o.x=99 # Output: Setting value...
+
+# Getting value using descriptor
+print(o.x) # Output: Getting value...
+                 # 99
+
+# Deleting value using descriptor
+del o.x # Output: Deleting value...
+
+# Try to get again
+print(o.x) # Output: Getting value...
+                 # None
+
+• x = D()
+    •   creates a descriptor instance object and store the key : value or x : address_of_d() mapping in the class namespace(C.__dict__)
+
+• o.x = 99
+    • Search x in o.__class__.__dict__ and finds d() is a descriptor object with function __set__
+    • Call x.__set__(self,o,99)
+
+• o.x
+    • Find x is a descriptor object with function __get__
+    • Call x.__get__(self,o,C)
+
+• del o.x
+    • Find x is a descriptor object with function __delete__
+    • Call x.__delete__(self,o)
+
+• The actual value (99) is stored in the instance(o) namespace (o.__dict__) and not in the descriptor namespace. The descriptor just manages access to that value(o.key=value)

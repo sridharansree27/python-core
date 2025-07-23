@@ -1,0 +1,20 @@
+Bytecode is a sequence of instructions understood by the Python Virtual Machine (PVM) or Interpreter
+f.__code__
+  Return the code object that contains the compiled bytecode of the function f
+f.__code__.co_code
+  Returns the raw bytecode (as a bytes object) from the code object
+  Contains the actual compiled instructions that the Python interpreter runs
+  This is not a human readable format
+dis.dis(f)
+  convert the bytecode contained in the code object(f.__code__) of the function(f) into a human readable format
+
+def f(name):
+  return name
+import dis
+dis.dis(f)
+
+OUTPUT
+ 1           RESUME                   0
+
+ 2           LOAD_FAST                0 (name)
+              RETURN_VALUE

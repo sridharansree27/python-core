@@ -173,8 +173,8 @@ Abstract.input()
 # Bank.main(_)
 
 ###
-#COCEPTS
-#Desin pattern
+#CONCEPTS
+#Design pattern
 class C:
     @staticmethod
     def disp():

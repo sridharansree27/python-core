@@ -1,0 +1,69 @@
+class C:
+  def f(name):
+    return name
+o=C()
+o.f()
+
+class C
+    • Class Object creation(class C to class object of type=Type)
+    • Function Object creation(function def f to object of type=Function)
+The function object created is stored in the class namespace under the key 'f'
+
+o = C()
+
+    • Instance Object creation(class object of type=Type to instance object of type=C)
+    • All methods (instance, static, class) are stored in the class object of type=Type (eg., C.__dict__) and  not stored in the instance object of type=C(eg., o.__dict__)
+    • The instance object (o) only stores attributes assigned specifically to it (e.g., self.x, self.y, etc.) in o.__dict__
+
+o.f()
+
+Python follows below process when calling o.f(),
+
+    • Search the key "f" in the instance namespace(eg,. o.__dict__)
+        ○ Looks in o.__dict__
+        ○ Since methods are not  stored in instance object namespace, it does not find the key "f" in the instance namespace
+    • Looks up the class(C) of the instance(o)
+        ○ Via o.__class__ or type(o), which gives the class (e.g., C)
+    • Search the key "f" in the class namespace(eg,. C.__dict__)
+        ○ Looks in o.__class__.__dict__['f']
+        ○ Find the unbound function object by searching key "f" in class namespace
+    • Wraps or binds the function object(f) to the instance(o)
+        ○ Convert the function object into a object created using bound method by f.__get__(o, C)
+    • Call the bound method
+        ○ Call bound method as f(o), which is equivalent to o.f(), passing "self" automatically
+
+Bound Method
+
+f.__get__(o, C)
+
+    • f: The function object stored in the class object of type=Type (e.g., C.__dict__['f'])
+    • __get__: A method implemented by any object that follows the descriptor protocol
+    • o: The instance object of type=C of the class object of type=Type
+    • C: The class for the instance object(o)
+
+This call returns a object created using bound method as below,
+<bound method C.f of <__main__.C object at 0x...>>
+
+Internally, this bound method wraps the original function object and automatically passes "o" as the first argument (self) when called
+
+Without Binding
+
+class C:
+  def f(self):
+    print("Binded Function Object")
+    return self
+
+manual_bind = C.__dict__['f']
+print(manual_bind(o)) # Need to manually pass o
+
+
+With Binding (automatic when using o.f)
+
+auto_bind = o.__class__.__dict__['f'].__get__(o,C) # Binds the f to o
+print(auto_bind()) # Internally calls f(o)
+
+So, If we write,
+o.f()
+
+It is internally translated as,
+o.__class__.__dict__['f'].__get__(o, C)()
