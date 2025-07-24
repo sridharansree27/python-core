@@ -1,9 +1,9 @@
-	• It is a Python object that sets something up, lets us to use it, and then cleans it up, automatically
-	• A class becomes a context manager if it defines two methods
+• It is a Python object that sets something up, lets us to use it, and then cleans it up, automatically
+• A class becomes a context manager if it defines two methods
 	
 	def __enter__(self):
     ...
-def __exit__(self, exc_type, exc_val, exc_tb):
+  def __exit__(self, exc_type, exc_val, exc_tb):
     ...
 
 with
