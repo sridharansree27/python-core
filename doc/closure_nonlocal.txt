@@ -1,0 +1,46 @@
+def outer():
+  message="Hello World"
+
+  def inner():
+    print(message)
+
+  print("inner.__closure__=",inner.__closure__)
+  print("inner.__closure__[0].cell_contents=",inner.__closure__[0].cell_contents)
+  return inner
+
+f=outer()
+f()
+
+1. Function objects capture enclosing variables (Closures)
+When outer() is called:
+	• It creates a new local namespace with message = "Hello"
+	• It defines the function inner() as inner->function object inside that local namespace
+	• After inner is returned by outer(), the local execution frame (stack frame) of outer() is destroyed since its execution is complete. However, Python does not discard the variables that are used by inner(). Instead, it captures those variables (like message) in a closure — a special structure that keeps them alive — so that inner() can access them even after outer() has finished execution
+
+2. inner() carries a hidden reference to message
+	• Python creates a closure and binds it to inner function object(f)
+	• Now f:
+		○ Points to the function inner()
+		○ Also carries a reference to the environment(closure) where message was defined
+
+Why nonlocal is needed in closures
+	• By default, in a nested function, when you assign a value to a variable (e.g., count += 1), Python assumes it is a new local variable, even if a variable with the same name exists in the enclosing scope.
+	But if you want to modify a variable that already exists in the enclosing function, you must use the nonlocal keyword to explicitly tell Python:
+		○ “Don’t create a new local variable — use the variable from the enclosing scope present in closure”
+
+	• nonlocal is a keyword defined to tell Python not to treat a variable with an assignment operator (=, +=, etc.) inside nested function as a new local variable, but instead to use the variable from the closure (enclosing scope)
+
+def counter():
+  count=0
+
+  def increment():
+    nonlocal count # This tells Python to use 'count' from the enclosing scope
+    count+=1
+    return count
+
+  return increment
+
+inc=counter()
+print(inc()) # 1
+print(inc()) # 2
+print(inc()) # 3

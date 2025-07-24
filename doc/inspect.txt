@@ -1,0 +1,21 @@
+• The inspect module is part of Python’s standard library. It let to introspect (examine) live objects — such as:
+	• Functions
+	• Classes
+	• Modules
+	• Objects
+
+• Can use it to:
+	• View a function’s source code
+	• See what arguments a function accepts
+	• Check if something is a class, method, coroutine, generator, etc.
+	• Get information about a stack frame (useful in debugging)
+
+import inspect
+
+def example():
+  pass
+
+print(inspect.isfunction(example)) # True
+print(inspect.ismodule(inspect)) # True
+print(inspect.isclass(int)) # True
+print(inspect.getsource(example)) # def example(): pass

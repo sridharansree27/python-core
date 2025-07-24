@@ -1,0 +1,99 @@
+• A coroutine is a special type of function declared using async that can pause its execution using await and resume later, allowing to write non-blocking asynchronous code
+• To perform I/O-bound tasks efficiently (e.g., downloading files, making HTTP requests, reading from a database)
+• Instead of blocking (waiting) for one task to finish, coroutines pause and let other tasks run — like multi-tasking without threads
+• It is ran using await and asyncio.run()
+• await must be used inside another async function(async def f():), because await is only valid inside an async def function
+
+async def
+Declares a coroutine
+await
+Pauses the coroutine until the awaited result is ready
+
+The Event Loop is a scheduler that
+	• Manages all async tasks
+	• Controls when each coroutine runs, pauses, or resumes
+
+Comparison: Sequential vs Concurrent
+
+• Sequential (not using gather)
+await task("A", 2)
+await task("B", 2)
+
+Runs one after another (total = 4 sec)
+
+• Concurrent (using gather)
+await asyncio.gather(
+    task("A", 2),
+    task("B", 2),
+)
+
+Runs both together (total = 2 sec)
+
+import asyncio
+
+async def task(name,delay):
+  print(f"{name}started")
+  await asyncio.sleep(delay)
+  print(f"{name} finished after {delay} seconds")
+
+async def main():
+  await asyncio.gather(
+    task("TaskA",2),
+    task("TaskB",1)
+  )
+
+asyncio.run(main())
+
+1. asyncio.run(main())
+	• Python starts the event loop
+	• Schedules and runs the main() coroutine
+	• main() becomes the top-level coroutine
+
+2. Inside main(), await asyncio.gather(...)
+	• main() pauses at await asyncio.gather(...) until both tasks are finished
+	• asyncio.gather()
+		○ Starts both coroutines: task("TaskA", 2) and task("TaskB", 1)
+		○ Runs them concurrently (not in parallel, but cooperatively sharing time)
+
+3. Event loop starts executing task("TaskA", 2)
+	• Prints: TaskA started
+	• Hits await asyncio.sleep(2)
+		○ Pauses TaskA for 2 seconds
+		○ Control is given back to the event loop
+
+4. Event loop switches to task("TaskB", 1)
+	• Prints: TaskB started
+	• Hits await asyncio.sleep(1):
+		○ Pauses TaskB for 1 second.
+		○ Control again returns to the event loop.
+	At this point:
+		○ TaskA is sleeping for 2s
+		○ TaskB is sleeping for 1s
+
+5. After 1 second
+	• asyncio.sleep(1) completes
+	• Event loop resumes TaskB
+	• Prints: TaskB finished after 1 seconds
+
+6. After another 1 second (total 2s)
+	• asyncio.sleep(2) completes
+	• Event loop resumes TaskA
+	• Prints: TaskA finished after 2 seconds
+
+7. All tasks complete
+	• asyncio.gather() completes — it waits for both tasks
+	• Control returns to main(), which now completes
+	• asyncio.run() shuts down the event loop and exits
+
+Timeline Visualization
+Time 0s:  TaskA started
+          TaskB started
+          TaskA → await sleep(2)
+          TaskB → await sleep(1)
+
+Time 1s:  TaskB resumes → prints "TaskB finished"
+          TaskA still sleeping
+
+Time 2s:  TaskA resumes → prints "TaskA finished"
+
+main() completes, event loop ends

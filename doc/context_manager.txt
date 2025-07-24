@@ -1,0 +1,54 @@
+	• It is a Python object that sets something up, lets us to use it, and then cleans it up, automatically
+	• A class becomes a context manager if it defines two methods
+	
+	def __enter__(self):
+    ...
+def __exit__(self, exc_type, exc_val, exc_tb):
+    ...
+
+with
+	• with is a control flow statement
+	• It uses the context manager’s __enter__() and __exit__() methods internally
+	• The code inside the with block is executed AFTER __enter__() has completed, and BEFORE __exit__() is called
+
+class ContextManager:
+  def__init__(self,filename,mode):
+    self.filename=filename
+    self.mode=mode
+
+  def__enter__(self):
+    print("Opening file...")
+    self.file=open(self.filename,self.mode)
+    return self.file # This is assigned to `as f`
+
+  def__exit__(self,exc_type,exc_val,exc_tb):
+    print("Closingfile...")
+    self.file.close()
+
+with ContextManager("sample.txt","w") as f:
+  f.write("HelloWorld!")
+
+The with statement executes the above code internally as,
+
+# Step 1: Create the context manager object
+o = FileManager("sample.txt", "w")
+
+# Step 2: Call __enter__ and assign return to f
+f = o.__enter__()  # f is now the file object
+
+try:
+    # Step 3: Execute the code block inside `with`
+    f.write("Hello, world!")
+
+# Step 4: On success or failure, call __exit__
+finally:
+    o.__exit__(exc_type, exc_val, traceback)  # Automatically handles errors too
+
+Exception Swallowing
+
+When an error happens inside the with block,
+	• Immediately calls the __exit__() method of the context manager
+	• Passes the exception details (exc_type, exc_val, exc_tb)
+	• If __exit__() returns
+		○ True → the exception is swallowed (suppressed)
+		○ False or None → the exception is re-raised

@@ -1,0 +1,64 @@
+o.name
+	• Python tries to get the attribute name from object o
+	• We can customize how this works using
+		○ __getattribute__ – always called when any attribute is accessed inside object
+		○ __getattr__ – called only if the attribute is not found inside object
+
+class C:
+    def __init__(self):
+        self.x = 10
+
+    def __getattribute__(self, name):
+        print(f"Accessing: {name}")
+        return super().__getattribute__(name)
+
+    def __getattr__(self,name):
+      print(f"{name} not found, returning default")
+      return 0
+
+o = C()
+print(o.x)
+print(o.y)
+
+Step 1: o = C() — Creating the object
+	• __init__() is called
+	• self.x = 10 sets the attribute x on the object o
+	• At this point:
+		The instance o has a dictionary: o.__dict__ = {'x': 10}
+	
+Step 2: print(o.x) — Access known attribute
+This is equivalent to:
+  value = o.__getattribute__('x')
+  print(value)
+
+So Python internally does the following:
+
+	• Calls o.__getattribute__('x')
+
+	• Since we override __getattribute__, our version runs,
+  
+	print(f"Accessing: {name}")  # → prints: Accessing: x
+	return super().__getattribute__(name)
+
+	• Now super().__getattribute__('x') calls the default implementation (from object), which:
+
+		○ Looks up 'x' in o.__dict__
+		○ Finds 10 and returns it
+	• If we directly write self.x inside __getattribute__, it will call itself recursively and cause an infinite loop
+	• That’s why we use super().__getattribute__(name) to avoid recursion
+
+	• print(o.x) prints 10
+
+Step 2: print(o.y) — Access unknown attribute
+This is equivalent to:
+  value = o.__getattr__('y')
+  print(value)
+
+So Python internally does the following:
+
+	• Calls o.__getattr__('y')
+
+	• Since we override __getattr__, our version runs,
+  
+	print(f"{name} not found, returning default")
+	return 0
